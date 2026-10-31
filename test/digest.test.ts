@@ -104,8 +104,8 @@ describe("digest building", () => {
 
   it("never uses em dashes", () => {
     const d = buildDigest(input({ newReviews: [review("a", 3, "Fine")] }));
-    expect(d.text).not.toContain("—");
-    expect(d.html).not.toContain("—");
+    expect(d.text).not.toContain("\u2014");
+    expect(d.html).not.toContain("\u2014");
   });
 });
 
