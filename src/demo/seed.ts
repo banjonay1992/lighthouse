@@ -61,6 +61,7 @@ export async function seedDemo(ctx: JobContext): Promise<boolean> {
   await store.upsertRelease({ id: "demo-tide-blog", appId: "tidewatch", platform: "other", version: "Winter tides blog post", state: "planned", releaseDate: today, source: "manual", notes: null, updatedAt: iso(now) });
 
   await backfillUptime(store, await store.listEndpoints(), now);
+  await store.recordJobRun("uptime", iso(now), true, null);
 
   // Collect everything once so reviews, expiries and projects appear.
   await runJobs(ctx, ["reviews", "versions", "expiries", "supabase"]);

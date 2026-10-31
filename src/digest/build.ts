@@ -92,17 +92,21 @@ function reviewSection(input: DigestInput): Section | null {
 
 function uptimeSection(input: DigestInput): Section | null {
   if (input.incidents.length === 0) return null;
+  // Ongoing incidents first, then the most recent resolved ones.
+  const sorted = [...input.incidents].sort((a, b) => Number(Boolean(a.resolvedAt)) - Number(Boolean(b.resolvedAt)));
+  const shown = sorted.slice(0, 5);
   const lines: string[] = [];
-  for (const i of input.incidents) {
+  for (const i of shown) {
     const name = i.endpointName ?? i.endpointId;
     if (i.resolvedAt) {
       const took = formatDuration(Date.parse(i.resolvedAt) - Date.parse(i.startedAt));
-      lines.push(`${name} was down for ${took} from ${formatTime(i.startedAt, input.timeZone)} (${i.cause}). Resolved.`);
+      lines.push(`${name} was down for ${took} from ${formatTime(i.startedAt, input.timeZone)} and has recovered. Cause: ${i.cause}.`);
     } else {
       const took = formatDuration(input.now.getTime() - Date.parse(i.startedAt));
-      lines.push(`${name} is down, for ${took} so far (${i.cause}).`);
+      lines.push(`${name} is down, for ${took} so far. Cause: ${i.cause}.`);
     }
   }
+  if (sorted.length > shown.length) lines.push(`…and ${sorted.length - shown.length} earlier incidents.`);
   return { title: "Uptime", lines };
 }
 
@@ -128,7 +132,8 @@ function releaseSection(input: DigestInput): Section | null {
 function changesSection(input: DigestInput): Section | null {
   const unhealthy = input.supabase.filter((p) => p.healthy === false);
   const lines = [
-    ...input.events.map((e) => (e.detail ? `${e.subject}: ${e.detail}.` : `${e.subject}.`)),
+    // Incidents have their own section, so skip their events here.
+    ...input.events.filter((e) => !e.kind.startsWith("incident_")).map((e) => (e.detail ? `${e.subject}: ${e.detail}.` : `${e.subject}.`)),
     ...unhealthy.map((p) => `Supabase project ${p.name} reports unhealthy services: ${p.services.filter((s) => !s.healthy).map((s) => s.name).join(", ")}.`),
   ];
   return lines.length ? { title: "Other changes", lines } : null;
@@ -152,7 +157,7 @@ export function buildDigest(input: DigestInput): DigestPreview {
   const quiet =
     input.newReviews.length === 0 &&
     input.incidents.length === 0 &&
-    input.events.length === 0 &&
+    !input.events.some((e) => !e.kind.startsWith("incident_")) &&
     !input.expiries.some((e) => e.severity !== "later") &&
     !input.supabase.some((p) => p.healthy === false);
 

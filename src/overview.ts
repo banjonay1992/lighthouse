@@ -41,7 +41,10 @@ export async function buildOverview(store: Store, options: { now: Date; timeZone
   }
 
   for (const x of expiries.filter((x) => x.severity === "expired" || x.severity === "urgent")) {
-    const when = x.daysLeft < 0 ? "has expired" : x.daysLeft === 0 ? "expires today" : `expires in ${x.daysLeft} day${x.daysLeft === 1 ? "" : "s"}`;
+    const days = `${x.daysLeft} day${x.daysLeft === 1 ? "" : "s"}`;
+    const when = x.manual
+      ? x.daysLeft < 0 ? "is overdue" : x.daysLeft === 0 ? "is due today" : `is due in ${days}`
+      : x.daysLeft < 0 ? "has expired" : x.daysLeft === 0 ? "expires today" : `expires in ${days}`;
     attention.push({ level: x.severity === "expired" ? "critical" : "warning", area: "expiries", message: `${x.label} ${when}`, href: "#/expiries" });
   }
 

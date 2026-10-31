@@ -86,8 +86,8 @@ describe("digest building", () => {
       }),
     );
     expect(d.subject).toBe("Lighthouse: 1 endpoint down, 1 expiry due");
-    expect(d.text).toContain("API is down, for 30 min so far (HTTP 503).");
-    expect(d.text).toContain("Website was down for 15 min from 13:00 (Timed out). Resolved.");
+    expect(d.text).toContain("API is down, for 30 min so far. Cause: HTTP 503.");
+    expect(d.text).toContain("Website was down for 15 min from 13:00 and has recovered. Cause: Timed out.");
     expect(d.text).toContain("Dev profile: 3 days left.");
     expect(d.text).not.toContain("TLS far away");
     expect(d.text).toContain("Tidewatch 3.4.0 (iOS), Wed 4 Nov: waiting for review.");
