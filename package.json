@@ -10,8 +10,8 @@
     "node": ">=22.13"
   },
   "scripts": {
-    "dev": "npm run build:web && npm run db:migrate:local && wrangler dev --var DEMO_MODE:true",
-    "dev:live": "npm run build:web && npm run db:migrate:local && wrangler dev",
+    "dev": "npm run build:web && npm run db:migrate:local && wrangler dev --var DEMO_MODE:true --test-scheduled",
+    "dev:live": "npm run build:web && npm run db:migrate:local && wrangler dev --test-scheduled",
     "dev:web": "vite --config web/vite.config.ts",
     "build": "npm run build:web",
     "build:web": "vite build --config web/vite.config.ts",
@@ -28,6 +28,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261031.1",
     "@types/node": "^22.20.5",
+    "happy-dom": "^21.0.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.7",
     "vitest": "^5.0.5",

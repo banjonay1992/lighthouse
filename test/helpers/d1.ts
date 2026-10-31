@@ -1,9 +1,13 @@
 // A small D1Database stand-in backed by Node's built-in SQLite, so the real
 // migrations and the real Store SQL run in tests without Cloudflare tooling.
 
-import { DatabaseSync, type SQLInputValue } from "node:sqlite";
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import type { DatabaseSync as DatabaseSyncType, SQLInputValue } from "node:sqlite";
+
+// Loaded at run time rather than imported so the helper also works in
+// browser-like test environments, where Vite refuses to bundle built-ins.
+const { DatabaseSync } = process.getBuiltinModule("node:sqlite") as typeof import("node:sqlite");
+const { readdirSync, readFileSync } = process.getBuiltinModule("node:fs") as typeof import("node:fs");
+const { join } = process.getBuiltinModule("node:path") as typeof import("node:path");
 
 type Value = SQLInputValue;
 
@@ -17,7 +21,7 @@ function normalise(values: unknown[]): Value[] {
 
 class Statement {
   constructor(
-    private readonly db: DatabaseSync,
+    private readonly db: DatabaseSyncType,
     readonly sql: string,
     private readonly params: Value[] = [],
   ) {}
@@ -60,7 +64,7 @@ class Statement {
 export function createTestD1(): D1Database {
   const db = new DatabaseSync(":memory:");
   db.exec("PRAGMA foreign_keys = ON;");
-  const dir = join(import.meta.dirname, "..", "..", "migrations");
+  const dir = join(process.cwd(), "migrations");
   for (const file of readdirSync(dir).filter((f) => f.endsWith(".sql")).sort()) {
     db.exec(readFileSync(join(dir, file), "utf8"));
   }
