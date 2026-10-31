@@ -397,6 +397,21 @@ export class Store {
       .run();
   }
 
+  async insertChecks(
+    rows: { endpointId: string; at: string; ok: boolean; statusCode: number | null; latencyMs: number | null; error: string | null }[],
+  ): Promise<void> {
+    if (rows.length === 0) return;
+    const stmt = this.db.prepare(
+      "INSERT INTO checks (endpoint_id, checked_at, ok, status_code, latency_ms, error) VALUES (?, ?, ?, ?, ?, ?)",
+    );
+    // D1 limits the size of a batch, so insert in chunks.
+    for (let i = 0; i < rows.length; i += 100) {
+      await this.db.batch(
+        rows.slice(i, i + 100).map((r) => stmt.bind(r.endpointId, r.at, r.ok ? 1 : 0, r.statusCode, r.latencyMs, r.error)),
+      );
+    }
+  }
+
   async checksSince(endpointId: string, since: string): Promise<CheckPoint[]> {
     const { results } = await this.db
       .prepare("SELECT checked_at, ok, latency_ms FROM checks WHERE endpoint_id = ? AND checked_at >= ? ORDER BY checked_at")
