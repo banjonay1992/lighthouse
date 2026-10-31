@@ -1,0 +1,28 @@
+# Copy to .dev.vars for local development. .dev.vars is git-ignored.
+# Every value below is a placeholder. Never commit real credentials.
+# In production set each secret with: npx wrangler secret put NAME
+
+# Sign-in (passphrase fallback). Use a long passphrase and a random secret,
+# for example from: openssl rand -base64 32
+LIGHTHOUSE_PASSPHRASE="replace-with-a-long-passphrase"
+SESSION_SECRET="replace-with-32-random-bytes-base64"
+
+# Cloudflare Access (recommended instead of the passphrase in production)
+# ACCESS_TEAM_DOMAIN="your-team"
+# ACCESS_AUD="application-audience-tag"
+
+# App Store Connect API key (Users and Access > Integrations)
+ASC_ISSUER_ID="00000000-0000-0000-0000-000000000000"
+ASC_KEY_ID="ABCDE12345"
+# The contents of the .p8 file. Newlines may be written as \n.
+ASC_PRIVATE_KEY="paste the full contents of AuthKey_ABCDE12345.p8 here"
+
+# Google Play service account JSON key, on one line
+GOOGLE_PLAY_SERVICE_ACCOUNT='{"type":"service_account","client_email":"lighthouse@your-project.iam.gserviceaccount.com","private_key":"paste the private_key value from the downloaded JSON key","token_uri":"https://oauth2.googleapis.com/token"}'
+
+# Supabase personal access token (Account > Access Tokens)
+SUPABASE_ACCESS_TOKEN="sbp_replace_me"
+
+# Digest delivery
+# DIGEST_WEBHOOK_URL="https://hooks.example.com/replace-me"
+# RESEND_API_KEY="re_replace_me"
