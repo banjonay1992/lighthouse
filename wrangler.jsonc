@@ -14,13 +14,16 @@
     "run_worker_first": ["/api/*"]
   },
 
-  // Replace database_id with the id printed by `wrangler d1 create lighthouse`.
-  // The placeholder is fine for local development.
+  // There is deliberately no database_id. On the first `wrangler deploy`,
+  // Wrangler finds the D1 database called "lighthouse" in your account, or
+  // creates it if there is none, and later deploys reuse it. If you prefer to
+  // pin it, run `npx wrangler d1 create lighthouse` and add the printed
+  // "database_id" next to "database_name" below. Local development needs
+  // neither.
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "lighthouse",
-      "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
     }
   ],
@@ -32,10 +35,37 @@
   // Non-secret settings. Credentials go in Worker secrets or .dev.vars.
   "vars": {
     "DEMO_MODE": "false",
+    "PUBLIC_DEMO": "false",
     "DIGEST_PROVIDER": "none",
     "DIGEST_HOUR": "8",
     "TIMEZONE": "Europe/London",
     "KEEP_REVIEWER_NAMES": "false",
     "CHECK_RETENTION_DAYS": "14"
+  },
+
+  "env": {
+    // The public demo: `npx wrangler deploy --env demo` deploys a separate
+    // Worker called "lighthouse-demo" with its own database. It shows only
+    // invented data, needs no secrets, refuses every change and resets its
+    // data once a day. Any secrets set on it are ignored.
+    "demo": {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "lighthouse-demo",
+          "migrations_dir": "migrations"
+        }
+      ],
+      "triggers": { "crons": ["*/5 * * * *"] },
+      "vars": {
+        "DEMO_MODE": "true",
+        "PUBLIC_DEMO": "true",
+        "DIGEST_PROVIDER": "none",
+        "DIGEST_HOUR": "8",
+        "TIMEZONE": "Europe/London",
+        "KEEP_REVIEWER_NAMES": "true",
+        "CHECK_RETENTION_DAYS": "2"
+      }
+    }
   }
 }

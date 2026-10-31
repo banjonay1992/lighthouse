@@ -15,12 +15,13 @@
     "dev:web": "vite --config web/vite.config.ts",
     "build": "npm run build:web",
     "build:web": "vite build --config web/vite.config.ts",
-    "db:migrate:local": "wrangler d1 migrations apply lighthouse --local",
-    "db:migrate:remote": "wrangler d1 migrations apply lighthouse --remote",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p web/tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "npm run build:web && wrangler deploy"
+    "deploy": "npm run build:web && wrangler deploy && wrangler d1 migrations apply DB --remote",
+    "deploy:demo": "npm run build:web && wrangler deploy --env demo && wrangler d1 migrations apply DB --env demo --remote"
   },
   "dependencies": {
     "preact": "^10.29.8"
