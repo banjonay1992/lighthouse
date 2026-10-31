@@ -22,6 +22,26 @@ const DEMO_ENDPOINTS = [
   { id: "hooks-relay", name: "Webhook relay", url: "https://hooks.example.org/health", keyword: null },
 ];
 
+export const DEMO_RESET_JOB = "demo_reset";
+
+/**
+ * A public demo runs for months, but reminders and planned releases are
+ * seeded with fixed dates. Once per local day, wipe the invented data and
+ * seed it again so the dates stay relative to today. Returns true when the
+ * data was reset.
+ */
+export async function refreshPublicDemo(ctx: JobContext): Promise<boolean> {
+  const { store, now } = ctx;
+  const runs = await store.listJobRuns();
+  const last = runs.find((r) => r.job === DEMO_RESET_JOB);
+  const today = localDate(now, ctx.config.timeZone);
+  if (last && localDate(new Date(last.lastRunAt), ctx.config.timeZone) === today && !(await store.isEmpty())) return false;
+  await store.clearAll();
+  await seedDemo(ctx);
+  await store.recordJobRun(DEMO_RESET_JOB, iso(now), true, null);
+  return true;
+}
+
 export async function seedDemo(ctx: JobContext): Promise<boolean> {
   const { store, now } = ctx;
   if (!(await store.isEmpty())) return false;

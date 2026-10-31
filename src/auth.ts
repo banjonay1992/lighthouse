@@ -8,7 +8,8 @@
 // the passphrase sets an HMAC-signed, HttpOnly session cookie.
 //
 // With neither configured, the API refuses every request, except in demo
-// mode where it is open (demo data only).
+// mode where it is open (demo data only). A public demo (PUBLIC_DEMO) is
+// always open and ignores any sign-in settings, because it is read-only.
 
 import type { Config, Env } from "./env";
 import { base64UrlDecode, base64UrlEncode, decodeJwt, verifyRs256 } from "./lib/jwt";
@@ -22,6 +23,7 @@ export const SESSION_TTL_S = 30 * 24 * 3600;
 const encoder = new TextEncoder();
 
 export function authMode(env: Env, config: Config): AuthMode {
+  if (config.publicDemo) return "open";
   if (env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD) return "access";
   if (env.LIGHTHOUSE_PASSPHRASE && env.SESSION_SECRET) return "passphrase";
   if (config.demo) return "open";

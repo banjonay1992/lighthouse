@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { api } from "../api";
+import { api, isReadOnly } from "../api";
 import { Empty, ErrorNote, Loading, PageHeader, Stars, useLoad } from "../components";
 import { PLATFORM_LABEL, timeAgo } from "../format";
 import { navigate, type Route } from "../router";
@@ -31,7 +31,8 @@ export function Reviews(props: { route: Route }) {
   };
 
   const setRead = async (review: Review, read: boolean) => {
-    await api.post("/reviews/read", { ids: [review.id], read });
+    // On the read-only demo the change is kept in the page only.
+    if (!isReadOnly()) await api.post("/reviews/read", { ids: [review.id], read });
     if (!data) return;
     setData({
       ...data,
@@ -41,7 +42,7 @@ export function Reviews(props: { route: Route }) {
   };
 
   const markAll = async () => {
-    await api.post("/reviews/read", app ? { all: true, app } : { all: true });
+    if (!isReadOnly()) await api.post("/reviews/read", app ? { all: true, app } : { all: true });
     if (data) setData({ ...data, unreadTotal: 0, reviews: data.reviews.map((r) => ({ ...r, readAt: r.readAt ?? new Date().toISOString() })) });
   };
 

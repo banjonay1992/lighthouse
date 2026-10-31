@@ -1,7 +1,7 @@
 import { render } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import "./styles.css";
-import { api } from "./api";
+import { api, ApiError, setReadOnly } from "./api";
 import type { SessionInfo } from "../../src/shared/types";
 import { Overview } from "./views/Overview";
 import { Reviews } from "./views/Reviews";
@@ -33,15 +33,44 @@ const NAV = [
   { id: "settings", label: "Settings" },
 ];
 
+/**
+ * Actions such as "Done" or "Delete" do not each handle their own errors.
+ * Any API error they leave unhandled is shown here briefly instead of
+ * failing silently.
+ */
+function useToast(): string | null {
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onRejection = (ev: PromiseRejectionEvent) => {
+      if (!(ev.reason instanceof ApiError) || ev.reason.status === 401) return;
+      ev.preventDefault();
+      setMessage(ev.reason.message);
+      clearTimeout(timer);
+      timer = setTimeout(() => setMessage(null), 5000);
+    };
+    window.addEventListener("unhandledrejection", onRejection);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, []);
+  return message;
+}
+
 function App() {
   const route = useRoute();
   const [session, setSession] = useState<SessionInfo | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
+  const toast = useToast();
 
   const loadSession = () =>
     api
       .get<SessionInfo>("/session")
-      .then(setSession)
+      .then((s) => {
+        setReadOnly(s.readOnly);
+        setSession(s);
+      })
       .catch((e: Error) => setFailed(e.message));
 
   useEffect(() => {
@@ -94,9 +123,16 @@ function App() {
             </a>
           ))}
         </nav>
-        {session.demo && <p class="demo-flag">Demo mode. All data is invented.</p>}
+        {session.demo && (
+          <p class="demo-flag">{session.readOnly ? "Read-only demo. All data is invented and resets daily." : "Demo mode. All data is invented."}</p>
+        )}
       </aside>
       <main class="content">{view}</main>
+      {toast && (
+        <p class="toast" role="status">
+          {toast}
+        </p>
+      )}
     </div>
   );
 }

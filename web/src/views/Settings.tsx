@@ -6,6 +6,7 @@ import type { App, DigestPreview, JobRun, SessionInfo } from "../../../src/share
 
 interface SettingsData {
   demo: boolean;
+  readOnly: boolean;
   authMode: string;
   timeZone: string;
   providers: Record<string, boolean>;
@@ -23,10 +24,21 @@ const PROVIDER_LABELS: Record<string, string> = {
   uptime: "Uptime checks",
 };
 
+const JOB_LABELS: Record<string, string> = {
+  uptime: "Uptime checks",
+  reviews: "Store reviews",
+  supabase: "Supabase status",
+  versions: "Store versions",
+  expiries: "Expiries and TLS",
+  maintenance: "Housekeeping",
+  digest: "Daily digest",
+  demo_reset: "Demo data reset",
+};
+
 const AUTH_LABELS: Record<string, string> = {
   access: "Cloudflare Access",
   passphrase: "Passphrase",
-  open: "Open (demo mode only)",
+  open: "Open (demo data only)",
   unconfigured: "Not configured",
 };
 
@@ -140,7 +152,7 @@ export function Settings(props: { session: SessionInfo }) {
         <ul class="rows">
           {s.jobs.map((j) => (
             <li key={j.job} class="row">
-              <span class="row-main">{j.job}</span>
+              <span class="row-main">{JOB_LABELS[j.job] ?? j.job}</span>
               <span class="muted small">{j.lastError ?? ""}</span>
               <span class="row-end">
                 <Badge tone={j.lastOk ? "ok" : "bad"}>{j.lastOk ? "ok" : "failed"}</Badge> {timeAgo(j.lastRunAt)}

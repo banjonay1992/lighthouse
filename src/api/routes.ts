@@ -50,6 +50,8 @@ const REPEAT_RULES = ["none", "monthly", "yearly"] as const satisfies readonly R
 const RELEASE_PLATFORMS = ["ios", "android", "web", "other"] as const satisfies readonly ReleasePlatform[];
 const RUNNABLE_JOBS = ["uptime", "reviews", "supabase", "versions", "expiries", "maintenance"] as const satisfies readonly JobName[];
 
+export const READ_ONLY_MESSAGE = "This is a read-only demo, so changes are switched off. Run Lighthouse yourself to try them.";
+
 const PUBLIC_ROUTES = new Set(["GET /api/health", "GET /api/session", "POST /api/login", "POST /api/logout"]);
 
 const throttle = new LoginThrottle();
@@ -66,6 +68,7 @@ router.add("GET", "/api/session", async (ctx, _p, request) => {
     authMode: authMode(ctx.env, ctx.config),
     authenticated: await isAuthenticated(request, ctx.env, ctx.config, ctx.fetcher, ctx.now),
     demo: ctx.config.demo,
+    readOnly: ctx.config.publicDemo,
   };
   return json(info);
 });
@@ -101,6 +104,7 @@ router.add("GET", "/api/settings", async (ctx) => {
   const sender = ctx.sender;
   return json({
     demo: ctx.config.demo,
+    readOnly: ctx.config.publicDemo,
     authMode: authMode(ctx.env, ctx.config),
     timeZone: ctx.config.timeZone,
     providers: providerStatus(ctx.env, ctx.config),
@@ -379,6 +383,9 @@ export async function handleApi(request: Request, ctx: AppContext): Promise<Resp
 
     if (method !== "GET" && method !== "HEAD" && !sameOrigin(request, url)) {
       return errorResponse(403, "Cross-origin request refused");
+    }
+    if (ctx.config.publicDemo && method !== "GET" && method !== "HEAD") {
+      return errorResponse(403, READ_ONLY_MESSAGE);
     }
     if (!PUBLIC_ROUTES.has(`${method} ${url.pathname}`)) {
       if (!(await isAuthenticated(request, ctx.env, ctx.config, ctx.fetcher, ctx.now))) {

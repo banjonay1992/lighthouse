@@ -230,3 +230,10 @@ input, select { font: inherit; font-size: 0.9rem; padding: 7px 10px; border: 1px
 .calendar-item.platform-android { background: var(--ok-soft); color: var(--ok); }
 .calendar-item.platform-web, .calendar-item.platform-other { background: var(--surface-2); color: var(--text); }
 @media (max-width: 760px) { .calendar-cell { min-height: 48px; } .calendar-item { font-size: 0; height: 6px; padding: 0; } }
+
+/* Toast for actions that failed or were refused */
+.toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); margin: 0;
+  max-width: min(520px, calc(100vw - 32px)); padding: 10px 16px; border-radius: var(--radius);
+  background: var(--text); color: var(--bg); font-size: 0.9rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18); z-index: 10;
+}

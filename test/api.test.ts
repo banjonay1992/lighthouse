@@ -28,11 +28,46 @@ function client(envOverrides: Partial<Env> = {}) {
 
 beforeEach(() => resetDemoSeed());
 
+describe("API on a public demo deployment", () => {
+  it("is open, read-only and ignores credentials", async () => {
+    const { call } = client({
+      PUBLIC_DEMO: "true",
+      LIGHTHOUSE_PASSPHRASE: "a passphrase that must be ignored",
+      SESSION_SECRET: "secret",
+      DIGEST_PROVIDER: "webhook",
+      DIGEST_WEBHOOK_URL: "https://hooks.example.com/ignored",
+    });
+    const session = await call("GET", "/api/session");
+    expect(session.body).toEqual({ authMode: "open", authenticated: true, demo: true, readOnly: true });
+    const overview = await call("GET", "/api/overview");
+    expect(overview.status).toBe(200);
+    expect((overview.body as Overview).uptime.total).toBe(4);
+
+    const settings = (await call("GET", "/api/settings")).body;
+    expect(settings.readOnly).toBe(true);
+    expect(settings.digest.provider).toBe("none");
+
+    for (const [method, path, body] of [
+      ["POST", "/api/reviews/read", { all: true }],
+      ["POST", "/api/endpoints", { name: "Extra", url: "https://extra.example.com/" }],
+      ["DELETE", "/api/endpoints/sync-worker", undefined],
+      ["POST", "/api/run", {}],
+      ["POST", "/api/digest/test", {}],
+      ["POST", "/api/login", { passphrase: "a passphrase that must be ignored" }],
+    ] as const) {
+      const res = await call(method, path, body);
+      expect(res.status, `${method} ${path}`).toBe(403);
+      expect(res.body.error).toMatch(/read-only demo/);
+    }
+    expect(((await call("GET", "/api/endpoints")).body as EndpointSummary[]).length).toBe(4);
+  });
+});
+
 describe("API in demo mode", () => {
   it("serves an overview from seeded demo data", async () => {
     const { call } = client({ DEMO_MODE: "true" });
     const session = await call("GET", "/api/session");
-    expect(session.body).toEqual({ authMode: "open", authenticated: true, demo: true });
+    expect(session.body).toEqual({ authMode: "open", authenticated: true, demo: true, readOnly: false });
     const res = await call("GET", "/api/overview");
     expect(res.status).toBe(200);
     expect(res.headers.get("cache-control")).toBe("no-store");

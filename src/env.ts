@@ -8,6 +8,7 @@ export interface Env {
 
   // Settings (wrangler.jsonc "vars")
   DEMO_MODE?: string;
+  PUBLIC_DEMO?: string;
   TIMEZONE?: string;
   DIGEST_PROVIDER?: string;
   DIGEST_HOUR?: string;
@@ -38,6 +39,11 @@ export type DigestProviderName = "none" | "log" | "webhook" | "resend";
 
 export interface Config {
   demo: boolean;
+  /**
+   * A public, read-only demo deployment: forces demo mode, ignores every
+   * credential, refuses writes and resets the invented data once a day.
+   */
+  publicDemo: boolean;
   timeZone: string;
   keepReviewerNames: boolean;
   checkRetentionDays: number;
@@ -71,11 +77,14 @@ function validTimeZone(tz: string | undefined): string {
 }
 
 export function readConfig(env: Env): Config {
-  const demo = truthy(env.DEMO_MODE);
-  const provider = (env.DIGEST_PROVIDER ?? "none").trim().toLowerCase();
+  const publicDemo = truthy(env.PUBLIC_DEMO);
+  const demo = publicDemo || truthy(env.DEMO_MODE);
+  // A public demo never sends a digest, whatever else is configured.
+  const provider = publicDemo ? "none" : (env.DIGEST_PROVIDER ?? "none").trim().toLowerCase();
   const format = (env.DIGEST_WEBHOOK_FORMAT ?? "json").trim().toLowerCase();
   return {
     demo,
+    publicDemo,
     timeZone: validTimeZone(env.TIMEZONE),
     keepReviewerNames: truthy(env.KEEP_REVIEWER_NAMES),
     checkRetentionDays: int(env.CHECK_RETENTION_DAYS, 14, 1, 365),

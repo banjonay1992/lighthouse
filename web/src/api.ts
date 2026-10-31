@@ -9,7 +9,21 @@ export class ApiError extends Error {
   }
 }
 
+let readOnly = false;
+
+/** On a public demo every change is refused, so do not even send it. */
+export function setReadOnly(value: boolean): void {
+  readOnly = value;
+}
+
+export function isReadOnly(): boolean {
+  return readOnly;
+}
+
+export const READ_ONLY_MESSAGE = "This is a read-only demo, so changes are switched off.";
+
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (readOnly && method !== "GET") throw new ApiError(403, READ_ONLY_MESSAGE);
   const init: RequestInit = { method, credentials: "same-origin", headers: { accept: "application/json" } };
   if (body !== undefined) {
     init.body = JSON.stringify(body);

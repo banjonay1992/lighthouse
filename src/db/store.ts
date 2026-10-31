@@ -730,6 +730,25 @@ export class Store {
       .run();
   }
 
+  /** Delete every row. Only used to reset the invented data of a public demo. */
+  async clearAll(): Promise<void> {
+    const tables = [
+      "reviews",
+      "checks",
+      "incidents",
+      "releases",
+      "apps",
+      "endpoints",
+      "expiries",
+      "reminders",
+      "supabase_projects",
+      "job_runs",
+      "events",
+      "digests",
+    ];
+    await this.db.batch(tables.map((t) => this.db.prepare(`DELETE FROM ${t}`)));
+  }
+
   async isEmpty(): Promise<boolean> {
     const row = await this.db
       .prepare("SELECT (SELECT COUNT(*) FROM apps) + (SELECT COUNT(*) FROM endpoints) AS n")

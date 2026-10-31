@@ -168,6 +168,8 @@ export interface SessionInfo {
   authMode: "access" | "passphrase" | "open" | "unconfigured";
   authenticated: boolean;
   demo: boolean;
+  /** True on a public demo deployment, where the API refuses every change. */
+  readOnly: boolean;
 }
 
 export interface DigestPreview {

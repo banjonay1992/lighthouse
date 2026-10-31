@@ -4,7 +4,7 @@
 
 import { handleApi } from "./api/routes";
 import { createContext } from "./context";
-import { seedDemo } from "./demo/seed";
+import { refreshPublicDemo, seedDemo } from "./demo/seed";
 import type { Env } from "./env";
 import { runScheduledTick } from "./jobs";
 
@@ -20,7 +20,11 @@ export default {
 
   async scheduled(controller, env): Promise<void> {
     const ctx = createContext(env, new Date(controller.scheduledTime));
-    if (ctx.config.demo) await seedDemo(ctx);
+    if (ctx.config.publicDemo) {
+      if (await refreshPublicDemo(ctx)) console.log("[demo] invented data reset for the day");
+    } else if (ctx.config.demo) {
+      await seedDemo(ctx);
+    }
     const outcomes = await runScheduledTick(ctx);
     for (const o of outcomes) {
       if (o.ok) console.log(`[${o.job}] ${o.summary}`);
