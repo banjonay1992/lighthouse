@@ -1,8 +1,27 @@
 # Lighthouse
 
+[![CI](https://github.com/banjonay1992/lighthouse/actions/workflows/ci.yml/badge.svg)](https://github.com/banjonay1992/lighthouse/actions/workflows/ci.yml)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 Lighthouse is a self-hosted operations dashboard for a small app studio. It runs as a single Cloudflare Worker with a D1 database and puts the things you would otherwise check in six different consoles on one quiet page.
 
 The idea is a calm surface with depth on demand. The overview shows a short list of things that need you, and nothing else shouts. Everything else is one click away when you want it.
+
+**Status:** v0.1.0. Built by Nathan Cole (NAY Productions) for his own apps, which it will watch once deployed. Next up is checking the store adapters against live accounts ([#1](https://github.com/banjonay1992/lighthouse/issues/1)); the rest of the planned work is in the [roadmap](ROADMAP.md).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/overview-dark.png">
+  <img alt="The Lighthouse overview in demo mode: four items needing attention, tiles for reviews, endpoints, expiries and Supabase, and the releases coming up" src="docs/screenshots/overview-light.png">
+</picture>
+
+Every name, review and hostname in these screenshots is invented demo data. Each view is in [docs/screenshots](docs/screenshots/) in both light and dark themes.
+
+| | |
+| --- | --- |
+| [![Reviews, filtered to three stars and above and unread only](docs/screenshots/reviews-light.png)](docs/screenshots/reviews-light.png) **Reviews** with app, star and unread filters | [![Uptime with a latency sparkline per endpoint and a resolved incident](docs/screenshots/uptime-light.png)](docs/screenshots/uptime-light.png) **Uptime** with sparklines and recent incidents |
+| [![One endpoint opened to show 24 hours of latency and its check history](docs/screenshots/uptime-detail-light.png)](docs/screenshots/uptime-detail-light.png) **Endpoint detail** with a failed check marked | [![Expiries for profiles, agreements, domains and certificates](docs/screenshots/expiries-light.png)](docs/screenshots/expiries-light.png) **Expiries**, most pressing first |
+| [![A month calendar of releases from both stores and planned by hand](docs/screenshots/releases-light.png)](docs/screenshots/releases-light.png) **Releases** calendar | [![Three Supabase projects, one of them paused](docs/screenshots/supabase-light.png)](docs/screenshots/supabase-light.png) **Supabase** projects and service health |
+| [![Settings with apps, connections and scheduled jobs](docs/screenshots/settings-dark.png)](docs/screenshots/settings-dark.png) **Settings** in the dark theme | [![The overview at phone width](docs/screenshots/overview-phone-light.png)](docs/screenshots/overview-phone-light.png) **Overview** at phone width |
 
 ## What it does
 
@@ -45,6 +64,8 @@ curl "http://localhost:8787/cdn-cgi/handler/scheduled?cron=*/5+*+*+*+*"
 For front-end work with hot reload, run `npm run dev` in one terminal and `npm run dev:web` in another, then use the Vite address it prints. API calls are proxied to the Worker.
 
 To start again with fresh demo data, delete the `.wrangler` folder.
+
+The screenshots above were taken this way, with `KEEP_REVIEWER_NAMES` switched on so the invented nicknames show, at 1440 by 900 and at phone width.
 
 The other scripts:
 
@@ -164,19 +185,115 @@ If neither is configured, the API refuses every request (the health check aside)
 
 ## Deploying
 
-These are the steps; nothing in this repository deploys automatically.
+There are two ways to deploy, and they can live side by side in one Cloudflare account:
+
+- **For yourself**, as the Worker `lighthouse` with your own credentials and sign-in.
+- **As a public demo**, as the Worker `lighthouse-demo`: invented data only, no credentials, and an API that refuses every change.
+
+Nothing in this repository deploys by itself. Each option can be deployed from your machine with Wrangler or from GitHub with Workers Builds.
+
+### The D1 database
+
+`wrangler.jsonc` names the database but deliberately has no `database_id`, so there is no placeholder to replace. On the first deploy Wrangler looks for a D1 database with that name in your account and creates it if there is none; later deploys reuse it, including from Workers Builds. The personal deploy uses a database called `lighthouse` and the demo uses `lighthouse-demo`, so the two never share data.
+
+If you would rather create the database yourself and pin it:
+
+```sh
+npx wrangler d1 create lighthouse
+```
+
+then add the `database_id` it prints next to `"database_name": "lighthouse"` in `wrangler.jsonc` (and likewise with `lighthouse-demo` under `env.demo` for the demo). Local development needs neither.
+
+The deploy scripts apply migrations straight after `wrangler deploy`, because on a first deploy the database only exists once the deploy has created it. On that first deploy the dashboard may return errors for a few seconds until the migrations finish.
+
+### Deploy for yourself
+
+From your machine:
 
 1. Log in: `npx wrangler login`.
-2. Create the database: `npx wrangler d1 create lighthouse`, and copy the `database_id` it prints into `wrangler.jsonc` in place of the zeros.
-3. Apply the migrations: `npm run db:migrate:remote`.
-4. Review the `vars` in `wrangler.jsonc`, especially `TIMEZONE` and `DIGEST_HOUR`. Leave `DEMO_MODE` as `"false"`.
-5. Set up sign-in (see above) and the secrets for the providers you want.
-6. Deploy: `npm run deploy`. This builds the front end and runs `wrangler deploy`.
-7. Open the dashboard, add your apps and endpoints, and press "Run collectors now" on the Settings page to check every connection straight away.
+2. Review the `vars` in `wrangler.jsonc`, especially `TIMEZONE` and `DIGEST_HOUR`. Leave `DEMO_MODE` and `PUBLIC_DEMO` as `"false"`.
+3. Set up sign-in (see [Sign-in](#sign-in)) and the secrets for the providers you want, with `npx wrangler secret put NAME`. If the Worker does not exist yet, Wrangler offers to create it.
+4. Deploy: `npm run deploy`. This builds the front end, runs `wrangler deploy` (creating the `lighthouse` database if needed) and applies the migrations.
+5. Open the dashboard, add your apps and endpoints, and press "Run collectors now" on the Settings page to check every connection straight away.
+
+With Workers Builds, so that every push to `main` deploys: in the Cloudflare dashboard go to Workers & Pages, choose Create, then Import a repository, pick your fork of this repository and use these settings.
+
+| Setting | Value |
+| --- | --- |
+| Worker name | `lighthouse` (must match `name` in `wrangler.jsonc`) |
+| Production branch | `main` |
+| Root directory | `/` (the repository root) |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy && npx wrangler d1 migrations apply DB --remote` |
+| Non-production branch builds | Off, or a preview command of your choice |
+| Build variables | None needed |
+
+Workers Builds installs dependencies itself and uses the Wrangler version from `package.json`. Its build token needs permission to edit Workers scripts and D1; if the first build fails with a D1 permission error, add D1 Edit to the token under the Worker's Build settings.
+
+Set secrets on the Worker under Settings, then Variables and Secrets (as type Secret), or with `npx wrangler secret put`. Secrets survive deploys. Plain variables come from `wrangler.jsonc` on every deploy, so change them there rather than in the dashboard.
+
+What the personal deploy ends up with:
+
+| Kind | Name | Value |
+| --- | --- | --- |
+| D1 binding | `DB` | database `lighthouse` |
+| Assets binding | `ASSETS` | `./dist`, single-page app fallback, `/api/*` goes to the Worker first |
+| Cron Trigger | | `*/5 * * * *` |
+| Variables | `DEMO_MODE`, `PUBLIC_DEMO` | `false` |
+| Variables | `TIMEZONE`, `DIGEST_PROVIDER`, `DIGEST_HOUR`, others | see [Settings reference](#settings-reference) |
+| Secrets for sign-in | `LIGHTHOUSE_PASSPHRASE` and `SESSION_SECRET` | or the variables `ACCESS_TEAM_DOMAIN` and `ACCESS_AUD` for Cloudflare Access |
+| Secrets per provider | `ASC_ISSUER_ID`, `ASC_KEY_ID`, `ASC_PRIVATE_KEY`, `GOOGLE_PLAY_SERVICE_ACCOUNT`, `SUPABASE_ACCESS_TOKEN`, `DIGEST_WEBHOOK_URL`, `RESEND_API_KEY` | only the ones you use |
+
+### Deploy the public demo
+
+The demo is the `demo` environment in `wrangler.jsonc`. It deploys a separate Worker called `lighthouse-demo` with its own `lighthouse-demo` database and these settings:
+
+- `PUBLIC_DEMO` is `true`, which forces demo mode and fake providers whatever else is set. Secrets are ignored, so there is nothing to configure and nothing to leak.
+- The API answers reads only. Every change (marking reviews read, adding endpoints, running collectors, sending a digest, signing in) gets a 403, and the front end explains that it is a read-only demo instead of failing silently. Marking a review read still works within the page, so visitors can try it.
+- No digest is ever sent.
+- Once a day the scheduled job wipes the invented data and seeds it again, so reminders and planned releases stay relative to today.
+- Reviewer nicknames are shown, since they are invented.
+
+From your machine:
+
+```sh
+npx wrangler login
+npm run deploy:demo
+```
+
+With Workers Builds, create a second Worker connected to the same repository:
+
+| Setting | Value |
+| --- | --- |
+| Worker name | `lighthouse-demo` (the `name` from `wrangler.jsonc` plus the `-demo` environment suffix) |
+| Production branch | `main` |
+| Root directory | `/` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy --env demo && npx wrangler d1 migrations apply DB --env demo --remote` |
+| Non-production branch builds | Off |
+| Build variables | None |
+| Secrets | None |
+
+What the demo deploy ends up with:
+
+| Kind | Name | Value |
+| --- | --- | --- |
+| D1 binding | `DB` | database `lighthouse-demo` |
+| Assets binding | `ASSETS` | `./dist`, as above |
+| Cron Trigger | | `*/5 * * * *` (keeps uptime moving and runs the daily reset) |
+| Variables | `DEMO_MODE`, `PUBLIC_DEMO`, `KEEP_REVIEWER_NAMES` | `true` |
+| Variables | `DIGEST_PROVIDER` | `none` |
+| Variables | `CHECK_RETENTION_DAYS` | `2` |
+| Variables | `TIMEZONE`, `DIGEST_HOUR` | `Europe/London`, `8` |
+| Secrets | | none |
+
+You can try the demo configuration locally with `npx wrangler d1 migrations apply DB --env demo --local` followed by `npx wrangler dev --env demo`.
+
+### After deploying
 
 The cron trigger runs every five minutes. Each job remembers when it last ran, so uptime runs every tick, reviews and Supabase hourly, store versions every six hours, and expiries and housekeeping daily. A late or missed tick is caught up on the next one.
 
-For a handful of apps and endpoints this should sit well inside Cloudflare's free plan: each endpoint costs a few D1 writes per check. If you watch dozens of endpoints, compare the numbers with the current Workers and D1 limits.
+For a handful of apps and endpoints this should sit well inside Cloudflare's free plan: each endpoint costs a few D1 writes per check. If you watch dozens of endpoints, compare the numbers with the current Workers and D1 limits. The demo uses four invented endpoints, so it costs about the same as a small personal install.
 
 ## Settings reference
 
@@ -185,6 +302,7 @@ Variables live in `wrangler.jsonc` under `vars`. Secrets are set with `wrangler 
 | Name | Kind | Default | Purpose |
 | --- | --- | --- | --- |
 | `DEMO_MODE` | variable | `false` | Use invented data and fake providers |
+| `PUBLIC_DEMO` | variable | `false` | Public demo: forces demo mode, ignores secrets, refuses changes, resets data daily |
 | `TIMEZONE` | variable | `Europe/London` | Time zone for calendar days and the digest hour |
 | `DIGEST_PROVIDER` | variable | `none` | `none`, `log`, `webhook` or `resend` |
 | `DIGEST_HOUR` | variable | `8` | Local hour after which the daily digest is sent |
@@ -232,7 +350,7 @@ Every external API sits behind an interface in `src/providers/types.ts`, with a 
 - The App Store Connect key, Google service account and Supabase token are all more powerful than Lighthouse needs, because those services do not offer narrower read-only credentials for everything here. Lighthouse only ever makes read requests, with one exception: reading Google Play tracks opens a temporary edit, which it deletes again without committing. Give each credential the narrowest role that works and rotate it if you suspect it has leaked.
 - The front end is served with a strict Content Security Policy, no third-party scripts, fonts or analytics, and pages are marked not to be indexed. API responses are not cached. Writes must be same-origin JSON requests.
 - Review text is shown as text, never as HTML, and is escaped in the HTML digest.
-- Demo mode is open without sign-in. Do not deploy with `DEMO_MODE` set to `true` unless you are happy for anyone to see the invented data.
+- Demo mode is open without sign-in. Do not deploy with `DEMO_MODE` set to `true` unless you are happy for anyone to see the invented data. For a public demo, use the `demo` environment, which also sets `PUBLIC_DEMO` so the API is read-only and every credential is ignored.
 
 ## Limitations
 
@@ -242,7 +360,12 @@ Every external API sits behind an interface in `src/providers/types.ts`, with a 
 - Release dates from App Store Connect are only known when a release is scheduled; live versions and Play releases appear without a date.
 - Uptime checks run every five minutes, so an outage shorter than that may not be seen, and with the default threshold an incident opens after about ten minutes.
 - Login throttling is per Worker instance. Use Cloudflare Access or a rate limiting rule for real protection.
-- It is single-user, English only, and has no alerting other than the daily digest yet. See the roadmap.
+- It is single-user, English only, and has no alerting other than the daily digest yet.
+- The App Store Connect and Google Play adapters have so far been tested against invented fixtures that follow the published documentation, not against live accounts ([#1](https://github.com/banjonay1992/lighthouse/issues/1)).
+
+## Roadmap
+
+[ROADMAP.md](ROADMAP.md) sets out a little under seventy hours of planned work, from immediate incident alerts to review search. Each item is a [GitHub issue](https://github.com/banjonay1992/lighthouse/issues) with acceptance criteria and a rough estimate, grouped into the v0.2, v0.3 and Later milestones.
 
 ## Licence
 
