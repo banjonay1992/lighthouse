@@ -47,19 +47,19 @@ interface DemoReview {
 const REVIEWS: DemoReview[] = [
   { app: "tidewatch", platform: "ios", rating: 5, title: "Perfect for early swims", body: "I check it every morning before heading down to the cove. Clear, quick and no clutter.", nickname: "cove_dipper", territory: "GBR", hoursAgo: 3, version: null },
   { app: "tidewatch", platform: "ios", rating: 2, title: "Widget stopped updating", body: "Since the last update the home screen widget shows yesterday's tides until I open the app.", nickname: "slipway_sam", territory: "GBR", hoursAgo: 9, version: null },
-  { app: "tidewatch", platform: "android", rating: 4, title: "Very handy", body: "Does exactly what it says. Would love a tide height graph for the whole week.", nickname: "Invented Angler", territory: "en_GB", hoursAgo: 20, version: "3.3.2" },
+  { app: "tidewatch", platform: "android", rating: 4, title: null, body: "Very handy. Does exactly what it says. Would love a tide height graph for the whole week.", nickname: "Jen M.", territory: "en_GB", hoursAgo: 20, version: "3.3.2" },
   { app: "tidewatch", platform: "ios", rating: 5, title: null, body: "Lovely design and it works offline on the coast path.", nickname: "gull_watcher", territory: "IRL", hoursAgo: 30, version: null },
-  { app: "tidewatch", platform: "android", rating: 1, title: "Wrong harbour", body: "My local harbour is listed about two miles from where it really is.", nickname: "Made Up Mariner", territory: "en_GB", hoursAgo: 44, version: "3.3.2" },
+  { app: "tidewatch", platform: "android", rating: 1, title: null, body: "My local harbour is listed about two miles from where it really is, so the times are off.", nickname: "Alan P.", territory: "en_GB", hoursAgo: 44, version: "3.3.2" },
   { app: "tidewatch", platform: "ios", rating: 3, title: "Good but", body: "Good app but the notifications arrive a bit late for spring tides.", nickname: "rockpool_rita", territory: "AUS", hoursAgo: 70, version: null },
   { app: "tidewatch", platform: "ios", rating: 5, title: "Worth it", body: "Paid for the pro version within a week. The surf window feature is brilliant.", nickname: "longboard_lou", territory: "USA", hoursAgo: 96, version: null },
-  { app: "tidewatch", platform: "android", rating: 4, title: null, body: "Nice and light on battery.", nickname: "Pretend Paddler", territory: "de_DE", hoursAgo: 130, version: "3.3.1" },
+  { app: "tidewatch", platform: "android", rating: 4, title: null, body: "Nice and light on battery.", nickname: "Sophie K.", territory: "de_DE", hoursAgo: 130, version: "3.3.1" },
   { app: "moorland-notes", platform: "ios", rating: 5, title: "Calm and simple", body: "Finally a notes app that does not try to be everything. Syncs quietly in the background.", nickname: "heather_and_granite", territory: "GBR", hoursAgo: 5, version: null },
   { app: "moorland-notes", platform: "ios", rating: 4, title: "Almost there", body: "Really like it. Please add a way to export everything as plain text files.", nickname: "tor_top", territory: "GBR", hoursAgo: 26, version: null },
   { app: "moorland-notes", platform: "ios", rating: 2, title: "Lost a note", body: "A note I wrote on the train disappeared after syncing. Has happened twice now.", nickname: "branch_line_bea", territory: "GBR", hoursAgo: 50, version: null },
   { app: "moorland-notes", platform: "ios", rating: 5, title: null, body: "The search is fast and the fonts are easy on the eyes.", nickname: "quiet_quill", territory: "CAN", hoursAgo: 150, version: null },
-  { app: "signal-box", platform: "android", rating: 5, title: "Great for train spotters", body: "Live departures plus the history of each station. Brilliant hobby app.", nickname: "Fictional Fireman", territory: "en_GB", hoursAgo: 7, version: "2.0.1" },
-  { app: "signal-box", platform: "android", rating: 3, title: null, body: "Useful, though the map is slow on my older phone.", nickname: "Sample Shunter", territory: "en_GB", hoursAgo: 60, version: "2.0.1" },
-  { app: "signal-box", platform: "android", rating: 1, title: "Login loop", body: "Keeps asking me to sign in again every time I open it.", nickname: "Example Engineer", territory: "fr_FR", hoursAgo: 85, version: "2.0.0" },
+  { app: "signal-box", platform: "android", rating: 5, title: null, body: "Great for train spotters. Live departures plus the history of each station.", nickname: "Rob T.", territory: "en_GB", hoursAgo: 7, version: "2.0.1" },
+  { app: "signal-box", platform: "android", rating: 3, title: null, body: "Useful, though the map is slow on my older phone.", nickname: "Hannah W.", territory: "en_GB", hoursAgo: 60, version: "2.0.1" },
+  { app: "signal-box", platform: "android", rating: 1, title: null, body: "Keeps asking me to sign in again every time I open it.", nickname: "Luc D.", territory: "fr_FR", hoursAgo: 85, version: "2.0.0" },
 ];
 
 /** Rotating templates so a long-running demo keeps receiving new reviews. */
@@ -67,7 +67,7 @@ const ROLLING: Omit<DemoReview, "hoursAgo" | "nickname">[] = [
   { app: "tidewatch", platform: "ios", rating: 5, title: "Lovely", body: "Simple and reliable, exactly what a tide app should be.", territory: "GBR", version: null },
   { app: "tidewatch", platform: "android", rating: 4, title: null, body: "Good app, would like sunrise times on the same screen.", territory: "en_GB", version: "3.4.0" },
   { app: "moorland-notes", platform: "ios", rating: 3, title: "Fine", body: "Does the job. Tags would make it much better.", territory: "NZL", version: null },
-  { app: "signal-box", platform: "android", rating: 2, title: "Crash on map", body: "Opening the map view crashes the app straight away.", territory: "en_IE", version: "2.0.1" },
+  { app: "signal-box", platform: "android", rating: 2, title: null, body: "Opening the map view crashes the app straight away.", territory: "en_IE", version: "2.0.1" },
 ];
 
 const NICKNAMES = ["sea_glass_sid", "mizzle_mo", "drizzle_dan", "harbour_hen", "estuary_ed", "creek_kit"];
@@ -94,6 +94,8 @@ export function demoReviews(appId: string, platform: "ios" | "android", now: Dat
   for (let bucket = current - 2; bucket <= current; bucket++) {
     const template = ROLLING[bucket % ROLLING.length];
     if (!template || template.app !== appId || template.platform !== platform) continue;
+    const createdAt = bucket * BUCKET_MS + HOUR;
+    if (createdAt > now.getTime()) continue; // Not written yet.
     out.push({
       storeId: `demo-rolling-${bucket}`,
       platform,
@@ -103,7 +105,7 @@ export function demoReviews(appId: string, platform: "ios" | "android", now: Dat
       reviewer: NICKNAMES[bucket % NICKNAMES.length] ?? null,
       territory: template.territory,
       appVersion: template.version,
-      createdAt: new Date(bucket * BUCKET_MS + HOUR).toISOString(),
+      createdAt: new Date(createdAt).toISOString(),
     });
   }
   return out;
@@ -159,7 +161,7 @@ export class DemoSigningProvider implements SigningAssetsProvider {
     const t = this.now().getTime();
     return [
       { id: "asc-cert:demo-dist", kind: "certificate", label: "Apple Distribution certificate", expiresAt: iso(t + 212 * DAY), detail: "DISTRIBUTION" },
-      { id: "asc-cert:demo-push", kind: "certificate", label: "Push notification certificate (Tidewatch)", expiresAt: iso(t + 26 * DAY), detail: "APNS" },
+      { id: "asc-cert:demo-dev", kind: "certificate", label: "Apple Development certificate", expiresAt: iso(t + 26 * DAY), detail: "DEVELOPMENT" },
       { id: "asc-profile:demo-tide", kind: "profile", label: "Tidewatch App Store profile", expiresAt: iso(t + 212 * DAY), detail: "IOS_APP_STORE" },
       { id: "asc-profile:demo-moor-dev", kind: "profile", label: "Moorland Notes development profile", expiresAt: iso(t + 6 * DAY), detail: "IOS_APP_DEVELOPMENT" },
     ];
@@ -168,7 +170,7 @@ export class DemoSigningProvider implements SigningAssetsProvider {
 
 /**
  * Fake HTTP probe. Latency wanders around a per-host baseline. The sync
- * host has a short outage every few hours so incidents can be seen.
+ * host has a short outage once a day so an incident can be seen.
  */
 export class DemoUptimeProvider implements UptimeProvider {
   constructor(private readonly now: () => Date = () => new Date()) {}
@@ -183,10 +185,12 @@ export function demoProbe(url: string, at: Date): ProbeResult {
   const base = 40 + (hash(url) % 160);
   const jitter = hash(`${url}#${slot}`) % 90;
   const latencyMs = base + jitter;
-  if (url.includes("sync.") && slot % 40 < 3) {
+  // About one short outage a day on the sync host (opens an incident), and
+  // a single slow check now and then on the webhook relay (does not).
+  if (url.includes("sync.") && slot % 288 >= 200 && slot % 288 < 203) {
     return { ok: false, statusCode: 503, latencyMs: latencyMs + 400, error: "HTTP 503 (expected 2xx or 3xx)" };
   }
-  if (url.includes("hooks.") && slot % 97 === 0) {
+  if (url.includes("hooks.") && slot % 301 === 0) {
     return { ok: false, statusCode: null, latencyMs: 10_000, error: "Timed out after 10000 ms" };
   }
   return { ok: true, statusCode: 200, latencyMs, error: null };

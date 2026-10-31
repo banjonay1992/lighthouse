@@ -30,6 +30,17 @@ describe("demo providers", () => {
     expect(a.length).toBeGreaterThan(3);
   });
 
+  it("never date a review in the future", () => {
+    for (let h = 0; h < 48; h++) {
+      const now = new Date(NOW.getTime() + h * 1800_000);
+      for (const app of ["tidewatch", "moorland-notes", "signal-box"]) {
+        for (const platform of ["ios", "android"] as const) {
+          for (const r of demoReviews(app, platform, now)) expect(Date.parse(r.createdAt)).toBeLessThanOrEqual(now.getTime());
+        }
+      }
+    }
+  });
+
   it("include an occasional outage on the sync host", () => {
     const results = Array.from({ length: 288 }, (_, i) => demoProbe("https://sync.example.net/ping", new Date(NOW.getTime() + i * 300_000)));
     const failures = results.filter((r) => !r.ok).length;
