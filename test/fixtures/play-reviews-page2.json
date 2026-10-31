@@ -1,0 +1,18 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gp:AOqpTOExample0003",
+      "authorName": "Made Up Name",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Fine.",
+            "lastModified": { "seconds": "1793088000", "nanos": 0 },
+            "starRating": 3,
+            "reviewerLanguage": "de_DE"
+          }
+        }
+      ]
+    }
+  ]
+}

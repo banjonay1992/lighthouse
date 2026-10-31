@@ -1,0 +1,41 @@
+{
+  "reviews": [
+    {
+      "reviewId": "gp:AOqpTOExample0001",
+      "authorName": "Invented Person",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Works well\tNice and light on battery, does what it says.",
+            "lastModified": { "seconds": "1793260800", "nanos": 0 },
+            "starRating": 5,
+            "reviewerLanguage": "en_GB",
+            "appVersionName": "3.2.0"
+          }
+        },
+        {
+          "developerComment": {
+            "text": "Thanks for the kind words.",
+            "lastModified": { "seconds": "1793264400", "nanos": 0 }
+          }
+        }
+      ]
+    },
+    {
+      "reviewId": "gp:AOqpTOExample0002",
+      "authorName": "Another Invented Person",
+      "comments": [
+        {
+          "userComment": {
+            "text": "Sync stopped working after I changed phone.",
+            "lastModified": { "seconds": "1793174400", "nanos": 0 },
+            "starRating": 1,
+            "reviewerLanguage": "en_US",
+            "appVersionName": "3.1.9"
+          }
+        }
+      ]
+    }
+  ],
+  "tokenPagination": { "nextPageToken": "page-2" }
+}

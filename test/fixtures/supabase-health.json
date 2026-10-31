@@ -1,0 +1,6 @@
+[
+  { "name": "db", "healthy": true, "status": "ACTIVE_HEALTHY" },
+  { "name": "auth", "healthy": true, "status": "ACTIVE_HEALTHY" },
+  { "name": "rest", "healthy": false, "status": "UNHEALTHY", "error": "upstream timeout" },
+  { "name": "storage", "healthy": true, "status": "ACTIVE_HEALTHY" }
+]

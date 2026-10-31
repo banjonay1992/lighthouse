@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "type": "appStoreVersions",
+      "id": "ver-200",
+      "attributes": {
+        "versionString": "2.1.0",
+        "appStoreState": "WAITING_FOR_REVIEW",
+        "platform": "IOS",
+        "createdDate": "2026-10-25T09:00:00Z",
+        "earliestReleaseDate": "2026-11-04T09:00:00Z"
+      }
+    },
+    {
+      "type": "appStoreVersions",
+      "id": "ver-190",
+      "attributes": {
+        "versionString": "2.0.3",
+        "appStoreState": "READY_FOR_SALE",
+        "platform": "IOS",
+        "createdDate": "2026-09-30T09:00:00Z",
+        "earliestReleaseDate": null
+      }
+    },
+    {
+      "type": "appStoreVersions",
+      "id": "ver-180",
+      "attributes": {
+        "versionString": "2.0.2",
+        "appStoreState": "REPLACED_WITH_NEW_VERSION",
+        "platform": "IOS",
+        "createdDate": "2026-09-01T09:00:00Z"
+      }
+    }
+  ]
+}

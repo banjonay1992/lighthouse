@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "type": "customerReviews",
+      "id": "00000000-aaaa-0003",
+      "attributes": {
+        "rating": 4,
+        "title": null,
+        "body": "Good, would like a dark mode.",
+        "reviewerNickname": "tin_mine_tom",
+        "createdDate": "2026-10-20T10:00:00Z",
+        "territory": "AUS"
+      }
+    }
+  ],
+  "links": { "self": "https://api.appstoreconnect.apple.com/v1/apps/1234567890/customerReviews?cursor=Mg" }
+}

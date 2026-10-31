@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "type": "certificates",
+      "id": "CERT1",
+      "attributes": {
+        "name": "Apple Distribution: Example Studio",
+        "displayName": "Example Studio",
+        "certificateType": "DISTRIBUTION",
+        "expirationDate": "2027-02-14T12:00:00.000+0000",
+        "platform": null
+      }
+    }
+  ]
+}

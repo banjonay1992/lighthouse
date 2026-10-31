@@ -1,0 +1,14 @@
+{
+  "data": [
+    {
+      "type": "profiles",
+      "id": "PROF1",
+      "attributes": {
+        "name": "Kite App Store",
+        "profileType": "IOS_APP_STORE",
+        "profileState": "ACTIVE",
+        "expirationDate": "2026-11-20T12:00:00.000+0000"
+      }
+    }
+  ]
+}

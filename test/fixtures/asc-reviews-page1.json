@@ -1,0 +1,32 @@
+{
+  "data": [
+    {
+      "type": "customerReviews",
+      "id": "00000000-aaaa-0001",
+      "attributes": {
+        "rating": 5,
+        "title": "Exactly what I wanted",
+        "body": "Simple, quick and it remembers my settings. Lovely little app.",
+        "reviewerNickname": "pebble_walker",
+        "createdDate": "2026-10-29T08:15:00-07:00",
+        "territory": "GBR"
+      }
+    },
+    {
+      "type": "customerReviews",
+      "id": "00000000-aaaa-0002",
+      "attributes": {
+        "rating": 2,
+        "title": "Crashes on launch",
+        "body": "Since the last update it closes as soon as I open it.",
+        "reviewerNickname": "harbour_lights_77",
+        "createdDate": "2026-10-28T19:02:00-07:00",
+        "territory": "USA"
+      }
+    }
+  ],
+  "links": {
+    "self": "https://api.appstoreconnect.apple.com/v1/apps/1234567890/customerReviews",
+    "next": "https://api.appstoreconnect.apple.com/v1/apps/1234567890/customerReviews?cursor=Mg"
+  }
+}

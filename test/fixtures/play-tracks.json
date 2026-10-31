@@ -1,0 +1,16 @@
+{
+  "kind": "androidpublisher#tracksListResponse",
+  "tracks": [
+    {
+      "track": "production",
+      "releases": [
+        { "name": "3.2.0", "versionCodes": ["320"], "status": "inProgress", "userFraction": 0.2 },
+        { "name": "3.1.9", "versionCodes": ["319"], "status": "completed" }
+      ]
+    },
+    {
+      "track": "internal",
+      "releases": [{ "name": "3.3.0-beta1", "versionCodes": ["330"], "status": "completed" }]
+    }
+  ]
+}
