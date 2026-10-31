@@ -74,10 +74,12 @@ export function Sparkline(props: { points: CheckPoint[]; width?: number; height?
   const height = props.height ?? 40;
   const pts = props.points;
   if (pts.length < 2) return <svg class="spark" width={width} height={height} aria-hidden="true" />;
-  const latencies = pts.map((p) => p.latencyMs ?? 0);
-  const max = Math.max(...latencies, 1);
+  // Scale to successful checks only, so one timeout does not flatten the
+  // whole line. Failed checks are drawn at the top and marked below.
+  const okLatencies = pts.filter((p) => p.ok).map((p) => p.latencyMs ?? 0);
+  const max = Math.max(...(okLatencies.length ? okLatencies : pts.map((p) => p.latencyMs ?? 0)), 1) * 1.15;
   const step = width / (pts.length - 1);
-  const y = (v: number) => height - 6 - (v / max) * (height - 10);
+  const y = (v: number) => height - 6 - (Math.min(v, max) / max) * (height - 10);
   const line = pts.map((p, i) => `${(i * step).toFixed(1)},${y(p.latencyMs ?? 0).toFixed(1)}`).join(" ");
   return (
     <svg class="spark" width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Latency over the last 24 hours">

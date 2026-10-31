@@ -1,6 +1,6 @@
 import { api } from "../api";
 import { Badge, Dot, Empty, ErrorNote, Loading, PageHeader, useLoad } from "../components";
-import { formatBytes, timeAgo } from "../format";
+import { formatBytes, supabaseStatus, timeAgo } from "../format";
 import type { SupabaseProject } from "../../../src/shared/types";
 
 function statusTone(p: SupabaseProject): "ok" | "bad" | "warn" | "idle" {
@@ -25,9 +25,9 @@ export function Supabase() {
           {data.map((p) => (
             <li key={p.ref} class="card project">
               <div class="project-head">
-                <Dot tone={statusTone(p)} label={p.status} />
+                <Dot tone={statusTone(p)} label={supabaseStatus(p.status)} />
                 <h2>{p.name}</h2>
-                <Badge tone={p.status.startsWith("ACTIVE") ? "neutral" : "warn"}>{p.status.toLowerCase().replace(/_/g, " ")}</Badge>
+                <Badge tone={p.status.startsWith("ACTIVE") ? "neutral" : "warn"}>{supabaseStatus(p.status)}</Badge>
               </div>
               <dl class="facts">
                 <dt>Reference</dt>

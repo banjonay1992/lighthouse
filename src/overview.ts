@@ -7,6 +7,7 @@ import { buildExpiryList } from "./expiry";
 import { formatDuration } from "./incidents";
 import { DAY, localDate, MINUTE } from "./lib/time";
 import type { AttentionItem, Overview } from "./shared/types";
+import { supabaseStatus } from "./shared/labels";
 
 const JOB_LABELS: Record<string, string> = {
   uptime: "Uptime checks",
@@ -60,7 +61,7 @@ export async function buildOverview(store: Store, options: { now: Date; timeZone
 
   for (const p of projects) {
     if (!p.status.startsWith("ACTIVE")) {
-      attention.push({ level: "warning", area: "supabase", message: `Supabase project ${p.name} is ${p.status.toLowerCase().replace(/_/g, " ")}`, href: "#/supabase" });
+      attention.push({ level: "warning", area: "supabase", message: `Supabase project ${p.name} is ${supabaseStatus(p.status)}`, href: "#/supabase" });
     } else if (p.healthy === false) {
       const bad = p.services.filter((s) => !s.healthy).map((s) => s.name).join(", ");
       attention.push({ level: "warning", area: "supabase", message: `Supabase project ${p.name}: ${bad} unhealthy`, href: "#/supabase" });

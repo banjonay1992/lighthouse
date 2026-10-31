@@ -1,10 +1,12 @@
 import { api } from "../api";
 import { Empty, ErrorNote, Loading, PageHeader, useLoad } from "../components";
 import { daysText, formatDate, PLATFORM_LABEL, timeAgo } from "../format";
-import type { Overview as OverviewData } from "../../../src/shared/types";
+import type { App, Overview as OverviewData } from "../../../src/shared/types";
 
 export function Overview() {
   const { data, error, loading } = useLoad(() => api.get<OverviewData>("/overview"));
+  const apps = useLoad(() => api.get<App[]>("/apps"));
+  const appName = (id: string | null) => (id ? (apps.data?.find((a) => a.id === id)?.name ?? "") : "");
   if (error) return <ErrorNote message={error} />;
   if (!data) return loading ? <Loading /> : null;
 
@@ -73,7 +75,7 @@ export function Overview() {
             {data.releases.upcoming.map((r) => (
               <li key={r.id} class="row">
                 <span class="row-main">
-                  {r.version} <span class="muted">({PLATFORM_LABEL[r.platform]})</span>
+                  {appName(r.appId)} {r.version} <span class="muted">({PLATFORM_LABEL[r.platform]})</span>
                 </span>
                 <span class="muted">{r.state}</span>
                 <span class="row-end">{r.releaseDate ? formatDate(r.releaseDate) : ""}</span>

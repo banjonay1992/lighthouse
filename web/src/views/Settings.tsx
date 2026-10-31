@@ -103,7 +103,7 @@ export function Settings(props: { session: SessionInfo }) {
         <h2>Apps</h2>
         <ul class="rows">
           {apps.data?.map((a) => (
-            <li key={a.id} class="row">
+            <li key={a.id} class="row app-row">
               <span class="row-main">{a.name}</span>
               <span class="muted small">
                 {[a.appstoreId && `App Store ${a.appstoreId}`, a.playPackage && `Play ${a.playPackage}`].filter(Boolean).join(", ")}

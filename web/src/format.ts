@@ -1,5 +1,7 @@
 // Formatting helpers. British English, no surprises.
 
+export { supabaseStatus } from "../../src/shared/labels";
+
 const rtf = new Intl.RelativeTimeFormat("en-GB", { numeric: "auto" });
 
 export function timeAgo(iso: string | null, now = Date.now()): string {
@@ -67,3 +69,35 @@ export const KIND_LABEL: Record<string, string> = {
   membership: "Membership",
   other: "Reminder",
 };
+
+/** Apple certificate and profile types, as App Store Connect reports them. */
+const SIGNING_TYPE_LABEL: Record<string, string> = {
+  DEVELOPMENT: "Apple Development",
+  DISTRIBUTION: "Apple Distribution",
+  IOS_DEVELOPMENT: "iOS Development",
+  IOS_DISTRIBUTION: "iOS Distribution",
+  MAC_APP_DEVELOPMENT: "Mac Development",
+  MAC_APP_DISTRIBUTION: "Mac App Distribution",
+  MAC_INSTALLER_DISTRIBUTION: "Mac Installer Distribution",
+  DEVELOPER_ID_APPLICATION: "Developer ID Application",
+  DEVELOPER_ID_KEXT: "Developer ID Kernel Extension",
+  PASS_TYPE_ID: "Pass Type ID",
+  PASS_TYPE_ID_WITH_NFC: "Pass Type ID with NFC",
+  IOS_APP_DEVELOPMENT: "iOS development",
+  IOS_APP_STORE: "iOS App Store",
+  IOS_APP_ADHOC: "iOS ad hoc",
+  IOS_APP_INHOUSE: "iOS in-house",
+  MAC_APP_STORE: "Mac App Store",
+  MAC_APP_DIRECT: "Mac direct distribution",
+  TVOS_APP_DEVELOPMENT: "tvOS development",
+  TVOS_APP_STORE: "tvOS App Store",
+  TVOS_APP_ADHOC: "tvOS ad hoc",
+};
+
+/** Turn an expiry's detail into something readable: known Apple types get a label, notes lose a trailing full stop. */
+export function expiryDetail(detail: string | null): string | null {
+  if (!detail) return null;
+  const known = SIGNING_TYPE_LABEL[detail];
+  if (known) return known;
+  return detail.trim().replace(/[.\s]+$/, "");
+}

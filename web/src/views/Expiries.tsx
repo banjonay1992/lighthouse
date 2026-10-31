@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import { api } from "../api";
 import { Badge, Disclosure, Empty, ErrorNote, Field, Loading, PageHeader, useLoad } from "../components";
-import { daysText, formatDate, KIND_LABEL } from "../format";
+import { daysText, expiryDetail, formatDate, KIND_LABEL } from "../format";
 import type { ExpiryItem, Severity } from "../../../src/shared/types";
 
 const SEVERITY_TONE: Record<Severity, "bad" | "warn" | "neutral" | "ok"> = {
@@ -41,7 +41,7 @@ export function Expiries() {
         {i.label}
         <span class="muted expiry-kind">
           {KIND_LABEL[i.kind] ?? i.kind}
-          {i.detail ? `, ${i.detail}` : ""}
+          {i.detail ? `, ${expiryDetail(i.detail)}` : ""}
           {i.repeat && i.repeat !== "none" ? `, repeats ${i.repeat}` : ""}
         </span>
       </span>
