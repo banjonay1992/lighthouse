@@ -1,0 +1,41 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lighthouse",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "observability": { "enabled": true },
+
+  // The built front end. Requests for /api/* always reach the Worker first;
+  // everything else is served from ./dist with SPA fallback.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Replace database_id with the id printed by `wrangler d1 create lighthouse`.
+  // The placeholder is fine for local development.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "lighthouse",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // One trigger every five minutes. The scheduler decides which jobs are due
+  // (uptime every run, reviews hourly, expiries and the digest daily).
+  "triggers": { "crons": ["*/5 * * * *"] },
+
+  // Non-secret settings. Credentials go in Worker secrets or .dev.vars.
+  "vars": {
+    "DEMO_MODE": "false",
+    "DIGEST_PROVIDER": "none",
+    "DIGEST_HOUR": "8",
+    "TIMEZONE": "Europe/London",
+    "KEEP_REVIEWER_NAMES": "false",
+    "CHECK_RETENTION_DAYS": "14"
+  }
+}

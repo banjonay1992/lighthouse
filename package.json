@@ -1,0 +1,36 @@
+{
+  "name": "lighthouse",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A calm, self-hosted operations dashboard for an indie app studio, running on Cloudflare Workers and D1.",
+  "license": "MIT",
+  "author": "Nathan Cole (NAY Productions)",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "dev": "npm run build:web && npm run db:migrate:local && wrangler dev --var DEMO_MODE:true",
+    "dev:live": "npm run build:web && npm run db:migrate:local && wrangler dev",
+    "dev:web": "vite --config web/vite.config.ts",
+    "build": "npm run build:web",
+    "build:web": "vite build --config web/vite.config.ts",
+    "db:migrate:local": "wrangler d1 migrations apply lighthouse --local",
+    "db:migrate:remote": "wrangler d1 migrations apply lighthouse --remote",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p web/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "deploy": "npm run build:web && wrangler deploy"
+  },
+  "dependencies": {
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261031.1",
+    "@types/node": "^22.20.5",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.156.0"
+  }
+}
