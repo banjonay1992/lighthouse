@@ -7,7 +7,7 @@ Lighthouse is a self-hosted operations dashboard for a small app studio. It runs
 
 The idea is a calm surface with depth on demand. The overview shows a short list of things that need you, and nothing else shouts. Everything else is one click away when you want it.
 
-**Status:** v0.1.0. Built by Nathan Cole (NAY Productions) for his own apps, which it will watch once deployed. Next up is checking the store adapters against live accounts ([#1](https://github.com/banjonay1992/lighthouse/issues/1)); the rest of the planned work is in the [roadmap](ROADMAP.md).
+**Status:** v0.1.0. A read-only demo with invented data is live at **https://lighthouse-demo.nathancoleasi.workers.dev**. Built by Nathan Cole (NAY Productions) for his own apps, which it will watch once deployed. Next up is checking the store adapters against live accounts ([#1](https://github.com/banjonay1992/lighthouse/issues/1)); the rest of the planned work is in the [roadmap](ROADMAP.md).
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/overview-dark.png">
